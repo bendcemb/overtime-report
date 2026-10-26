@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  overtime-report:
+    build: .
+    container_name: overtime-report-app
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5030:5030"
+    volumes:
+      - .:/app
+    networks:
+      - centralnet
+
+networks:
+  centralnet:
+    external: true
