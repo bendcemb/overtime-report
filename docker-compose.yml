@@ -11,6 +11,7 @@ services:
       - "5030:5030"
     volumes:
       - .:/app
+    command: gunicorn --workers 2 --reload --bind 0.0.0.0:5030 app:app
     networks:
       - centralnet
 
