@@ -42,36 +42,33 @@
 
     <!-- Main Container -->
     <main class="app-main">
-        <!-- Control Panel: Date Selector & Refno Filter -->
-        <section class="control-panel-grid">
-            <!-- 1. Date Range Card -->
-            <div class="panel-card date-card">
-                <div class="card-header">
+        <!-- 1. Top Filter Bar: Date Range Selector -->
+        <section class="date-bar-card panel-card">
+            <div class="date-bar-wrapper">
+                <div class="date-bar-title-group">
                     <div class="card-title">
                         <i class="fa-regular fa-calendar-days icon-accent"></i>
                         <span>1. เลือกช่วงวันที่จะดูรายงาน</span>
                     </div>
                     <span class="helper-text">กำหนดช่วงวันที่ต้องการดึงเอกสาร OT</span>
                 </div>
-                
-                <div class="card-body">
-                    <div class="date-inputs-row">
-                        <div class="form-group">
-                            <label for="startDateInput">
-                                <i class="fa-regular fa-calendar-check"></i> วันที่เริ่มต้น:
-                            </label>
-                            <input type="date" id="startDateInput" class="form-control" value="{{ default_start_date }}">
-                        </div>
-                        <div class="form-group">
-                            <label for="endDateInput">
-                                <i class="fa-regular fa-calendar-xmark"></i> วันที่สิ้นสุด:
-                            </label>
-                            <input type="date" id="endDateInput" class="form-control" value="{{ default_end_date }}">
-                        </div>
+
+                <div class="date-bar-inputs">
+                    <div class="form-group-inline">
+                        <label for="startDateInput">
+                            <i class="fa-regular fa-calendar-check"></i> เริ่มต้น:
+                        </label>
+                        <input type="date" id="startDateInput" class="form-control" value="{{ default_start_date }}">
                     </div>
 
-                    <!-- Quick Preset Buttons -->
-                    <div class="presets-row">
+                    <div class="form-group-inline">
+                        <label for="endDateInput">
+                            <i class="fa-regular fa-calendar-xmark"></i> สิ้นสุด:
+                        </label>
+                        <input type="date" id="endDateInput" class="form-control" value="{{ default_end_date }}">
+                    </div>
+
+                    <div class="presets-row-inline">
                         <span class="preset-label">ลัด:</span>
                         <button type="button" class="btn-preset" data-preset="today">วันนี้</button>
                         <button type="button" class="btn-preset" data-preset="yesterday">เมื่อวาน</button>
@@ -80,180 +77,185 @@
                         <button type="button" class="btn-preset" data-preset="lastMonth">เดือนที่แล้ว</button>
                     </div>
 
-                    <button id="fetchRefnosBtn" class="btn-primary w-full mt-3">
-                        <i class="fa-solid fa-magnifying-glass"></i> ค้นหาเอกสาร OT ในช่วงวันที่เลือก
+                    <button id="fetchRefnosBtn" class="btn-primary">
+                        <i class="fa-solid fa-magnifying-glass"></i> ค้นหาเอกสาร OT
                     </button>
                 </div>
             </div>
-
-            <!-- 2. RefNo Selector Card -->
-            <div class="panel-card refno-card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fa-solid fa-list-check icon-accent"></i>
-                        <span>2. เลือกเลขที่เอกสาร (Ref No) ที่ใช้ในรายงาน</span>
-                    </div>
-                    <div class="refno-summary-badge">
-                        เลือกแล้ว <strong id="selectedRefnoCount">0</strong> / <span id="totalRefnoCount">0</span> รายการ
-                    </div>
-                </div>
-
-                <div class="card-body refno-body">
-                    <!-- Refno Filter Controls -->
-                    <div class="refno-toolbar">
-                        <div class="search-box">
-                            <i class="fa-solid fa-search"></i>
-                            <input type="text" id="refnoSearchInput" placeholder="ค้นหา Ref No, แผนก, แผนกย่อย..." class="form-control-sm">
-                        </div>
-                        <div class="refno-actions">
-                            <button type="button" id="selectAllRefnosBtn" class="btn-sm btn-outline">
-                                <i class="fa-regular fa-check-square"></i> เลือกทั้งหมด
-                            </button>
-                            <button type="button" id="deselectAllRefnosBtn" class="btn-sm btn-outline">
-                                <i class="fa-regular fa-square"></i> ยกเลิกทั้งหมด
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Refno Checkboxes Container -->
-                    <div id="refnoListContainer" class="refno-list-scroll">
-                        <div class="empty-state-small">
-                            <i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลดเอกสาร OT...
-                        </div>
-                    </div>
-
-                    <!-- Generate Report Button -->
-                    <div class="generate-action-bar">
-                        <button id="generateReportBtn" class="btn-success w-full">
-                            <i class="fa-solid fa-table-list"></i> ประมวลผลและดูรายงานสรุปรายวัน / แผนก
-                        </button>
-                    </div>
-                </div>
-            </div>
         </section>
 
-        <!-- Report Tabs & Main Display Section -->
-        <section class="report-display-section">
-            <div class="report-container">
-                <!-- Navigation Tabs -->
-                <div class="report-nav-header">
-                    <div class="nav-tabs" role="tablist">
-                        <button class="nav-tab active" data-tab="tab-summary">
-                            <i class="fa-solid fa-table-list"></i> สรุปรายวันแยกตามแผนก (DEPT)
-                        </button>
-                        <button class="nav-tab" data-tab="tab-matrix">
-                            <i class="fa-solid fa-table-cells"></i> ตาราง Matrix (วันที่ x แผนก)
-                        </button>
-                        <button class="nav-tab" data-tab="tab-details">
-                            <i class="fa-solid fa-id-card"></i> รายชื่อพนักงานทั้งหมด
-                        </button>
-                    </div>
-
-                    <!-- Export Options -->
-                    <div class="report-export-actions">
-                        <button id="exportCsvBtn" class="btn-sm btn-outline-success" title="ดาวน์โหลดเป็นไฟล์ CSV สำหรับ Excel">
-                            <i class="fa-solid fa-file-excel"></i> ส่งออก Excel (CSV)
-                        </button>
-                        <button id="printReportBtn" class="btn-sm btn-outline-info" title="พิมพ์หน้ารายงาน">
-                            <i class="fa-solid fa-print"></i> พิมพ์รายงาน
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Tab 1: Summary by Date & Department -->
-                <div id="tab-summary" class="tab-pane active">
-                    <div class="table-filter-bar">
-                        <div class="search-box">
-                            <i class="fa-solid fa-filter"></i>
-                            <input type="text" id="summaryFilterInput" placeholder="กรองตามวันที่ หรือ แผนก..." class="form-control-sm">
+        <!-- Main Content Split Grid: Left = Report, Right = Ref No Selector -->
+        <div class="main-layout-grid">
+            <!-- Left Side: Report Display Section -->
+            <section class="report-display-section">
+                <div class="report-container">
+                    <!-- Navigation Tabs -->
+                    <div class="report-nav-header">
+                        <div class="nav-tabs" role="tablist">
+                            <button class="nav-tab active" data-tab="tab-summary">
+                                <i class="fa-solid fa-table-list"></i> สรุปรายวันแยกตามแผนก (DEPT)
+                            </button>
+                            <button class="nav-tab" data-tab="tab-matrix">
+                                <i class="fa-solid fa-table-cells"></i> ตาราง Matrix (วันที่ x แผนก)
+                            </button>
+                            <button class="nav-tab" data-tab="tab-details">
+                                <i class="fa-solid fa-id-card"></i> รายชื่อพนักงานทั้งหมด
+                            </button>
                         </div>
-                        <div class="table-info">
-                            พบ <strong id="summaryRowCount">0</strong> รายการสรุป
+
+                        <!-- Export Options -->
+                        <div class="report-export-actions">
+                            <button id="exportCsvBtn" class="btn-sm btn-outline-success" title="ดาวน์โหลดเป็นไฟล์ CSV สำหรับ Excel">
+                                <i class="fa-solid fa-file-excel"></i> ส่งออก Excel (CSV)
+                            </button>
+                            <button id="printReportBtn" class="btn-sm btn-outline-info" title="พิมพ์หน้ารายงาน">
+                                <i class="fa-solid fa-print"></i> พิมพ์รายงาน
+                            </button>
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="report-table" id="summaryTable">
-                            <thead>
-                                <tr>
-                                    <th style="width: 60px;">#</th>
-                                    <th>วันที่</th>
-                                    <th>แผนก (DEPT)</th>
-                                    <th class="text-center" style="width: 140px;">จำนวนคน (คน)</th>
-                                    <th class="text-center" style="width: 120px;">จำนวนเอกสาร</th>
-                                    <th>เลขที่เอกสาร (Ref No)</th>
-                                    <th class="text-right" style="width: 130px;">ชั่วโมงรวม (ชม.)</th>
-                                    <th class="text-center" style="width: 120px;">รายละเอียด</th>
-                                </tr>
-                            </thead>
-                            <tbody id="summaryTableBody">
-                                <!-- Populated via JavaScript -->
-                            </tbody>
-                            <tfoot id="summaryTableFoot">
-                                <!-- Totals row -->
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Tab 2: Matrix View (Dates as Rows, Depts as Columns) -->
-                <div id="tab-matrix" class="tab-pane">
-                    <div class="matrix-description">
-                        <i class="fa-solid fa-circle-info icon-accent"></i>
-                        <span>ตารางแสดงจำนวนพนักงาน (คน) ในแต่ละแผนก แยกตามรายวัน</span>
-                    </div>
-                    <div class="table-responsive matrix-wrapper">
-                        <table class="report-table matrix-table" id="matrixTable">
-                            <thead id="matrixHead">
-                                <!-- Populated dynamically -->
-                            </thead>
-                            <tbody id="matrixBody">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                            <tfoot id="matrixFoot">
-                                <!-- Populated dynamically -->
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Tab 3: All Employee Details -->
-                <div id="tab-details" class="tab-pane">
-                    <div class="table-filter-bar">
-                        <div class="search-box">
-                            <i class="fa-solid fa-search"></i>
-                            <input type="text" id="detailsFilterInput" placeholder="ค้นหารหัสพนักงาน, ชื่อ-นามสกุล, แผนก, งาน..." class="form-control-sm">
+                    <!-- Tab 1: Summary by Date & Department -->
+                    <div id="tab-summary" class="tab-pane active">
+                        <div class="table-filter-bar">
+                            <div class="search-box">
+                                <i class="fa-solid fa-filter"></i>
+                                <input type="text" id="summaryFilterInput" placeholder="กรองตามวันที่ หรือ แผนก..." class="form-control-sm">
+                            </div>
+                            <div class="table-info">
+                                พบ <strong id="summaryRowCount">0</strong> รายการสรุป
+                            </div>
                         </div>
-                        <div class="table-info">
-                            แสดง <strong id="detailsRowCount">0</strong> รายการพนักงาน
+
+                        <div class="table-responsive">
+                            <table class="report-table" id="summaryTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">#</th>
+                                        <th>วันที่</th>
+                                        <th>แผนก (DEPT)</th>
+                                        <th class="text-center" style="width: 130px;">จำนวนคน (คน)</th>
+                                        <th class="text-center" style="width: 110px;">จำนวนเอกสาร</th>
+                                        <th>เลขที่เอกสาร (Ref No)</th>
+                                        <th class="text-right" style="width: 120px;">ชั่วโมงรวม (ชม.)</th>
+                                        <th class="text-center" style="width: 110px;">รายละเอียด</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="summaryTableBody">
+                                    <!-- Populated via JavaScript -->
+                                </tbody>
+                                <tfoot id="summaryTableFoot">
+                                    <!-- Totals row -->
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="report-table" id="detailsTable">
-                            <thead>
-                                <tr>
-                                    <th style="width: 50px;">#</th>
-                                    <th>วันที่</th>
-                                    <th>Ref No</th>
-                                    <th>แผนก (DEPT)</th>
-                                    <th>ฝ่าย/ส่วนงาน</th>
-                                    <th>รหัส</th>
-                                    <th>ชื่อ - นามสกุล</th>
-                                    <th>ลักษณะงาน</th>
-                                    <th class="text-center">เวลาเข้า-ออก</th>
-                                    <th class="text-right">ชม. OT</th>
-                                    <th>จุดขึ้นรถ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="detailsTableBody">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
+                    <!-- Tab 2: Matrix View (Dates as Rows, Depts as Columns) -->
+                    <div id="tab-matrix" class="tab-pane">
+                        <div class="matrix-description">
+                            <i class="fa-solid fa-circle-info icon-accent"></i>
+                            <span>ตารางแสดงจำนวนพนักงาน (คน) ในแต่ละแผนก แยกตามรายวัน</span>
+                        </div>
+                        <div class="table-responsive matrix-wrapper">
+                            <table class="report-table matrix-table" id="matrixTable">
+                                <thead id="matrixHead">
+                                    <!-- Populated dynamically -->
+                                </thead>
+                                <tbody id="matrixBody">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                                <tfoot id="matrixFoot">
+                                    <!-- Populated dynamically -->
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: All Employee Details -->
+                    <div id="tab-details" class="tab-pane">
+                        <div class="table-filter-bar">
+                            <div class="search-box">
+                                <i class="fa-solid fa-search"></i>
+                                <input type="text" id="detailsFilterInput" placeholder="ค้นหารหัสพนักงาน, ชื่อ-นามสกุล, แผนก, งาน..." class="form-control-sm">
+                            </div>
+                            <div class="table-info">
+                                แสดง <strong id="detailsRowCount">0</strong> รายการพนักงาน
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="report-table" id="detailsTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">#</th>
+                                        <th>วันที่</th>
+                                        <th>Ref No</th>
+                                        <th>แผนก (DEPT)</th>
+                                        <th>ฝ่าย/ส่วนงาน</th>
+                                        <th>รหัส</th>
+                                        <th>ชื่อ - นามสกุล</th>
+                                        <th>ลักษณะงาน</th>
+                                        <th class="text-center">เวลาเข้า-ออก</th>
+                                        <th class="text-right">ชม. OT</th>
+                                        <th>จุดขึ้นรถ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detailsTableBody">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+
+            <!-- Right Side: 2. RefNo Selector Sidebar -->
+            <aside class="refno-sidebar">
+                <div class="panel-card refno-card sticky-sidebar">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fa-solid fa-list-check icon-accent"></i>
+                            <span>2. เลือกเลขที่เอกสาร (Ref No)</span>
+                        </div>
+                        <div class="refno-summary-badge">
+                            เลือก <strong id="selectedRefnoCount">0</strong> / <span id="totalRefnoCount">0</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body refno-body">
+                        <!-- Refno Filter Controls -->
+                        <div class="refno-toolbar">
+                            <div class="search-box">
+                                <i class="fa-solid fa-search"></i>
+                                <input type="text" id="refnoSearchInput" placeholder="ค้นหา Ref No, แผนก..." class="form-control-sm">
+                            </div>
+                            <div class="refno-actions">
+                                <button type="button" id="selectAllRefnosBtn" class="btn-sm btn-outline" title="เลือกทั้งหมด">
+                                    <i class="fa-regular fa-check-square"></i> ทั้งหมด
+                                </button>
+                                <button type="button" id="deselectAllRefnosBtn" class="btn-sm btn-outline" title="ยกเลิกทั้งหมด">
+                                    <i class="fa-regular fa-square"></i> ยกเลิก
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Refno Checkboxes Container -->
+                        <div id="refnoListContainer" class="refno-list-scroll">
+                            <div class="empty-state-small">
+                                <i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลดเอกสาร OT...
+                            </div>
+                        </div>
+
+                        <!-- Generate Report Button -->
+                        <div class="generate-action-bar">
+                            <button id="generateReportBtn" class="btn-success w-full">
+                                <i class="fa-solid fa-table-list"></i> ประมวลผลดูรายงาน
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
     </main>
 
     <!-- Modal: Employee Drilldown Modal -->
